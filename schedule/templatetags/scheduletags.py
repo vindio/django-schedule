@@ -76,7 +76,7 @@ def title(context, occurrence ):
 def options(context, occurrence ):
     context.update({
         'occurrence' : occurrence,
-        'MEDIA_URL' : getattr(settings, "MEDIA_URL"),
+        'STATIC_URL' : getattr(settings, "STATIC_URL"),
     })
     context['view_occurrence'] = occurrence.get_absolute_url()
     user = context['request'].user
@@ -93,7 +93,7 @@ def options(context, occurrence ):
 def create_event_url(context, calendar, slot ):
     context.update ( {
         'calendar' : calendar,
-        'MEDIA_URL' : getattr(settings, "MEDIA_URL"),
+        'STATIC_URL' : getattr(settings, "STATIC_URL"),
     })
     lookup_context = {
         'calendar_slug': calendar.slug,
@@ -190,12 +190,12 @@ def prevnext( target, slug, period, fmt=None):
     if fmt is None:
         fmt = settings.DATE_FORMAT
     context = {
-        'MEDIA_URL': getattr(settings, 'MEDIA_URL', ''),
+        'STATIC_URL': getattr(settings, 'STATIC_URL', ''),
         'slug' : slug,
         'period' : period,
         'period_name': format(period.start, fmt),
         'target':target,
-        'MEDIA_URL': settings.MEDIA_URL,
+        'STATIC_URL': settings.STATIC_URL,
     }
     return context
 
@@ -203,7 +203,7 @@ def prevnext( target, slug, period, fmt=None):
 def detail( occurrence ):
     context = {
         'occurrence' : occurrence,
-        'MEDIA_URL': settings.MEDIA_URL,
+        'STATIC_URL': settings.STATIC_URL,
     }
     return context
 
