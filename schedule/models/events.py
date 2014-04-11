@@ -99,11 +99,15 @@ class Event(models.Model):
         final_occurrences += occ_replacer.get_additional_occurrences(start, end)
         return final_occurrences
 
-    def get_rrule_object(self):
+    def get_rrule_object(self, tzinfo):
         if self.rule is not None:
             params = self.rule.get_params()
             frequency = self.rule.rrule_frequency()
-            return rrule.rrule(frequency, dtstart=self.start, **params)
+            if timezone.is_naive(self.start):
+                dtstart = self.start
+            else:
+                dtstart = tzinfo.normalize(self.start).replace(tzinfo=None)
+            return rrule.rrule(frequency, dtstart=dtstart, **params)
 
     def _create_occurrence(self, start, end=None):
         if end is None:
@@ -111,17 +115,24 @@ class Event(models.Model):
         return Occurrence(event=self, start=start, end=end, original_start=start, original_end=end)
 
     def get_occurrence(self, date):
-        if timezone.is_naive(date) and django_settings.USE_TZ:
+        use_naive = timezone.is_naive(date)
+        tzinfo = timezone.utc
+        if timezone.is_naive(date):
             date = timezone.make_aware(date, timezone.utc)
-        rule = self.get_rrule_object()
+        if date.tzinfo:
+            tzinfo = date.tzinfo
+        rule = self.get_rrule_object(tzinfo)
         if rule:
-            next_occurrence = rule.after(date, inc=True)
+            next_occurrence = rule.after(tzinfo.normalize(date).replace(tzinfo=None), inc=True)
+            next_occurrence = tzinfo.localize(next_occurrence)
         else:
             next_occurrence = self.start
         if next_occurrence == date:
             try:
                 return Occurrence.objects.get(event=self, original_start=date)
             except Occurrence.DoesNotExist:
+                if use_naive:
+                    next_occurrence = timezone.make_naive(next_occurrence, tzinfo)
                 return self._create_occurrence(next_occurrence)
 
     def _get_occurrence_list(self, start, end):
@@ -130,12 +141,21 @@ class Event(models.Model):
         """
         difference = (self.end - self.start)
         if self.rule is not None:
+            use_naive = timezone.is_naive(start)
+            tzinfo = timezone.utc
             occurrences = []
             if self.end_recurring_period and self.end_recurring_period < end:
                 end = self.end_recurring_period
-            rule = self.get_rrule_object()
-            o_starts = rule.between(start - difference, end - difference, inc=True)
+            if start.tzinfo:
+                tzinfo = start.tzinfo
+            rule = self.get_rrule_object(tzinfo)
+            n_start = (start - difference).replace(tzinfo=None)
+            n_end = (end - difference).replace(tzinfo=None)
+            o_starts = rule.between(n_start, n_end, inc=True)
             for o_start in o_starts:
+                o_start = tzinfo.localize(o_start)
+                if use_naive:
+                    o_start = timezone.make_naive(o_start, tzinfo)
                 o_end = o_start + difference
                 occurrences.append(self._create_occurrence(o_start, o_end))
             return occurrences
@@ -152,9 +172,12 @@ class Event(models.Model):
         datetime ``after``.
         """
 
+        tzinfo = timezone.utc
         if after is None:
             after = timezone.now()
-        rule = self.get_rrule_object()
+        elif not timezone.is_naive(after):
+            tzinfo = after.tzinfo
+        rule = self.get_rrule_object(tzinfo)
         if rule is None:
             if self.end > after:
                 yield self._create_occurrence(self.start, self.end)
@@ -163,7 +186,8 @@ class Event(models.Model):
         difference = self.end - self.start
         while True:
             o_start = date_iter.next()
-            if o_start > self.end_recurring_period:
+            o_start = tzinfo.localize(o_start)
+            if self.end_recurring_period and o_start > self.end_recurring_period:
                 raise StopIteration
             o_end = o_start + difference
             if o_end > after:
