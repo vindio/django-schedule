@@ -20,6 +20,8 @@ from schedule.models import Calendar, Occurrence, Event
 from schedule.periods import weekday_names
 from schedule.utils import check_event_permissions, coerce_date_dict
 
+import settings
+import pytz
 
 def calendar(request, calendar_slug, template='schedule/calendar.html'):
     """
@@ -81,6 +83,8 @@ def calendar_by_periods(request, calendar_slug, periods=None, template_name="sch
     if date:
         try:
             date = datetime.datetime(**date)
+            tz = pytz.timezone(settings.TIME_ZONE)
+            date = tz.localize(date)
         except ValueError:
             raise Http404
     else:
