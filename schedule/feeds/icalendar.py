@@ -1,4 +1,6 @@
 import vobject
+import pytz
+import settings
 
 from django.http import HttpResponse
 
@@ -12,6 +14,33 @@ EVENT_ITEMS = (
     ('created', 'created'),
 )
 
+FREQNAMES = ['YEARLY','MONTHLY','WEEKLY','DAILY','HOURLY','MINUTELY','SECONDLY']
+
+def reqstr(self):
+    parts = ['FREQ='+FREQNAMES[self._freq]]
+    if self._interval != 1:
+        parts.append('INTERVAL='+str(self._interval))
+    if self._wkst:
+        parts.append('WKST='+str(self._wkst))
+    if self._count:
+        parts.append('COUNT='+str(self._count))
+
+    for name, value in [
+            ('BYSETPOS', self._bysetpos),
+            ('BYMONTH', self._bymonth),
+            ('BYMONTHDAY', self._bymonthday),
+            ('BYYEARDAY', self._byyearday),
+            ('BYWEEKNO', self._byweekno),
+            ('BYWEEKDAY', self._byweekday),
+            ('BYHOUR', self._byhour),
+            ('BYMINUTE', self._byminute),
+            ('BYSECOND', self._bysecond),
+            ]:
+        if value:
+            parts.append(name+'='+','.join(str(v) for v in value))
+
+    return ';'.join(parts)
+
 
 class ICalendarFeed(object):
 
@@ -20,6 +49,7 @@ class ICalendarFeed(object):
         self.kwargs = kwargs
 
         cal = vobject.iCalendar()
+        tz = pytz.timezone(settings.TIME_ZONE)
 
         for item in self.items():
 
@@ -29,6 +59,10 @@ class ICalendarFeed(object):
                 value = getattr(self, 'item_' + key)(item)
                 if value:
                     event.add(vkey).value = value
+
+            rule = item.get_rrule_object(tz)
+            event.add('rrule').value = reqstr(rule)
+
 
         response = HttpResponse(cal.serialize())
         response['Content-Type'] = 'text/calendar'
