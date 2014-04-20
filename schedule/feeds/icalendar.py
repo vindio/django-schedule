@@ -1,6 +1,6 @@
 import vobject
 import pytz
-import settings
+from django.conf import settings
 
 from django.http import HttpResponse
 
@@ -61,7 +61,8 @@ class ICalendarFeed(object):
                     event.add(vkey).value = value
 
             rule = item.get_rrule_object(tz)
-            event.add('rrule').value = reqstr(rule)
+            if rule:
+                event.add('rrule').value = reqstr(rule)
 
 
         response = HttpResponse(cal.serialize())

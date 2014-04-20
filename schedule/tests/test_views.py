@@ -1,5 +1,6 @@
 import pytz
 import datetime
+from django.utils import timezone
 
 from django.contrib.auth.models import User
 from django.test.utils import override_settings
@@ -92,8 +93,8 @@ class TestUrls(TestCase):
                          "Example Calendar")
         month = self.response.context[0]["periods"]['month']
         self.assertEqual((month.start, month.end),
-                         (datetime.datetime(2000, 11, 1, 0, 0, tzinfo=pytz.utc),
-                          datetime.datetime(2000, 12, 1, 0, 0, tzinfo=pytz.utc)))
+                         (datetime.datetime(2000, 11, 1, 0, 0, tzinfo=timezone.get_current_timezone()),
+                          datetime.datetime(2000, 12, 1, 0, 0, tzinfo=timezone.get_current_timezone())))
 
     def test_event_creation_anonymous_user(self):
         self.response = self.client.get(reverse("calendar_create_event",
