@@ -144,13 +144,21 @@ class Event(models.Model):
             use_naive = timezone.is_naive(start)
             tzinfo = timezone.utc
             occurrences = []
-            if self.end_recurring_period and self.end_recurring_period < end:
-                end = self.end_recurring_period
             if start.tzinfo:
                 tzinfo = start.tzinfo
+            if self.end_recurring_period and self.end_recurring_period < end:
+                end = self.end_recurring_period
+                # If end_recurring_period is in UTC (as it should be)
+                # normalize it to given timezone (from start attribute)
+                if timezone.is_aware(end):
+                    end = tzinfo.normalize(end)
+                elif timezone.is_aware(start) and timezone.is_naive(end):
+                    end = tzinfo.localize(end)
             rule = self.get_rrule_object(tzinfo)
             n_start = (start - difference).replace(tzinfo=None)
             n_end = (end - difference).replace(tzinfo=None)
+            # n_start and n_end are normalized so that dst occurrences
+            # are generated right
             o_starts = rule.between(n_start, n_end, inc=True)
             for o_start in o_starts:
                 o_start = tzinfo.localize(o_start)
