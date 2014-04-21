@@ -1,5 +1,6 @@
 import datetime
 import pytz
+from django.utils import timezone
 
 from django.test import TestCase
 
@@ -30,7 +31,7 @@ class TestPeriod(TestCase):
 
     def test_get_occurrences(self):
         occurrence_list = self.period.occurrences
-        self.assertEqual(["%s to %s" %(o.start, o.end) for o in occurrence_list],
+        self.assertEqual(["%s to %s" %(timezone.utc.normalize(o.start), timezone.utc.normalize(o.end)) for o in occurrence_list],
                 ['2008-01-05 08:00:00+00:00 to 2008-01-05 09:00:00+00:00',
                     '2008-01-12 08:00:00+00:00 to 2008-01-12 09:00:00+00:00',
                     '2008-01-19 08:00:00+00:00 to 2008-01-19 09:00:00+00:00'])
@@ -98,29 +99,29 @@ class TestMonth(TestCase):
 
         if FIRST_DAY_OF_WEEK == 0:
             expecteds = [
-                (datetime.datetime(2008, 1, 27, 0, 0, tzinfo=pytz.utc),
-                 datetime.datetime(2008, 2, 3, 0, 0, tzinfo=pytz.utc)),
-                (datetime.datetime(2008, 2, 3, 0, 0, tzinfo=pytz.utc),
-                 datetime.datetime(2008, 2, 10, 0, 0, tzinfo=pytz.utc)),
-                (datetime.datetime(2008, 2, 10, 0, 0, tzinfo=pytz.utc),
-                 datetime.datetime(2008, 2, 17, 0, 0, tzinfo=pytz.utc)),
-                (datetime.datetime(2008, 2, 17, 0, 0, tzinfo=pytz.utc),
-                 datetime.datetime(2008, 2, 24, 0, 0, tzinfo=pytz.utc)),
-                (datetime.datetime(2008, 2, 24, 0, 0, tzinfo=pytz.utc),
-                 datetime.datetime(2008, 3, 2, 0, 0, tzinfo=pytz.utc))
+                (datetime.datetime(2008, 1, 27, 0, 0, tzinfo=timezone.get_current_timezone()),
+                 datetime.datetime(2008, 2, 3, 0, 0, tzinfo=timezone.get_current_timezone())),
+                (datetime.datetime(2008, 2, 3, 0, 0, tzinfo=timezone.get_current_timezone()),
+                 datetime.datetime(2008, 2, 10, 0, 0, tzinfo=timezone.get_current_timezone())),
+                (datetime.datetime(2008, 2, 10, 0, 0, tzinfo=timezone.get_current_timezone()),
+                 datetime.datetime(2008, 2, 17, 0, 0, tzinfo=timezone.get_current_timezone())),
+                (datetime.datetime(2008, 2, 17, 0, 0, tzinfo=timezone.get_current_timezone()),
+                 datetime.datetime(2008, 2, 24, 0, 0, tzinfo=timezone.get_current_timezone())),
+                (datetime.datetime(2008, 2, 24, 0, 0, tzinfo=timezone.get_current_timezone()),
+                 datetime.datetime(2008, 3, 2, 0, 0, tzinfo=timezone.get_current_timezone()))
             ]
         else:
             expecteds = [
-                (datetime.datetime(2008, 1, 28, 0, 0, tzinfo=pytz.utc),
-                 datetime.datetime(2008, 2, 4, 0, 0, tzinfo=pytz.utc)),
-                (datetime.datetime(2008, 2, 4, 0, 0, tzinfo=pytz.utc),
-                 datetime.datetime(2008, 2, 11, 0, 0, tzinfo=pytz.utc)),
-                (datetime.datetime(2008, 2, 11, 0, 0, tzinfo=pytz.utc),
-                 datetime.datetime(2008, 2, 18, 0, 0, tzinfo=pytz.utc)),
-                (datetime.datetime(2008, 2, 18, 0, 0, tzinfo=pytz.utc),
-                 datetime.datetime(2008, 2, 25, 0, 0, tzinfo=pytz.utc)),
-                (datetime.datetime(2008, 2, 25, 0, 0, tzinfo=pytz.utc),
-                 datetime.datetime(2008, 3, 3, 0, 0, tzinfo=pytz.utc))
+                (datetime.datetime(2008, 1, 28, 0, 0, tzinfo=timezone.get_current_timezone()),
+                 datetime.datetime(2008, 2, 4, 0, 0, tzinfo=timezone.get_current_timezone())),
+                (datetime.datetime(2008, 2, 4, 0, 0, tzinfo=timezone.get_current_timezone()),
+                 datetime.datetime(2008, 2, 11, 0, 0, tzinfo=timezone.get_current_timezone())),
+                (datetime.datetime(2008, 2, 11, 0, 0, tzinfo=timezone.get_current_timezone()),
+                 datetime.datetime(2008, 2, 18, 0, 0, tzinfo=timezone.get_current_timezone())),
+                (datetime.datetime(2008, 2, 18, 0, 0, tzinfo=timezone.get_current_timezone()),
+                 datetime.datetime(2008, 2, 25, 0, 0, tzinfo=timezone.get_current_timezone())),
+                (datetime.datetime(2008, 2, 25, 0, 0, tzinfo=timezone.get_current_timezone()),
+                 datetime.datetime(2008, 3, 3, 0, 0, tzinfo=timezone.get_current_timezone()))
             ]
 
         for actual, expected in zip(actuals, expecteds):
@@ -136,57 +137,57 @@ class TestMonth(TestCase):
             expecteds = [
                 (
                     0,
-                    datetime.datetime(2008, 1, 27, 0, 0, tzinfo=pytz.utc),
-                    datetime.datetime(2008, 1, 28, 0, 0, tzinfo=pytz.utc)
+                    datetime.datetime(2008, 1, 27, 0, 0, tzinfo=timezone.get_current_timezone()),
+                    datetime.datetime(2008, 1, 28, 0, 0, tzinfo=timezone.get_current_timezone())
                 ),
                 (
                     0,
-                    datetime.datetime(2008, 1, 28, 0, 0, tzinfo=pytz.utc),
-                    datetime.datetime(2008, 1, 29, 0, 0, tzinfo=pytz.utc)
+                    datetime.datetime(2008, 1, 28, 0, 0, tzinfo=timezone.get_current_timezone()),
+                    datetime.datetime(2008, 1, 29, 0, 0, tzinfo=timezone.get_current_timezone())
                 ),
                 (
                     0,
-                    datetime.datetime(2008, 1, 29, 0, 0, tzinfo=pytz.utc),
-                    datetime.datetime(2008, 1, 30, 0, 0, tzinfo=pytz.utc)
+                    datetime.datetime(2008, 1, 29, 0, 0, tzinfo=timezone.get_current_timezone()),
+                    datetime.datetime(2008, 1, 30, 0, 0, tzinfo=timezone.get_current_timezone())
                 ),
                 (
                     0,
-                    datetime.datetime(2008, 1, 30, 0, 0, tzinfo=pytz.utc),
-                    datetime.datetime(2008, 1, 31, 0, 0, tzinfo=pytz.utc)
+                    datetime.datetime(2008, 1, 30, 0, 0, tzinfo=timezone.get_current_timezone()),
+                    datetime.datetime(2008, 1, 31, 0, 0, tzinfo=timezone.get_current_timezone())
                 ),
                 (
                     0,
-                    datetime.datetime(2008, 1, 31, 0, 0, tzinfo=pytz.utc),
-                    datetime.datetime(2008, 2, 1, 0, 0, tzinfo=pytz.utc)
+                    datetime.datetime(2008, 1, 31, 0, 0, tzinfo=timezone.get_current_timezone()),
+                    datetime.datetime(2008, 2, 1, 0, 0, tzinfo=timezone.get_current_timezone())
                 ),
                 (
                     0,
-                    datetime.datetime(2008, 2, 1, 0, 0, tzinfo=pytz.utc),
-                    datetime.datetime(2008, 2, 2, 0, 0, tzinfo=pytz.utc)
+                    datetime.datetime(2008, 2, 1, 0, 0, tzinfo=timezone.get_current_timezone()),
+                    datetime.datetime(2008, 2, 2, 0, 0, tzinfo=timezone.get_current_timezone())
                 ),
                 (
                     1,
-                    datetime.datetime(2008, 2, 2, 0, 0, tzinfo=pytz.utc),
-                    datetime.datetime(2008, 2, 3, 0, 0, tzinfo=pytz.utc)
+                    datetime.datetime(2008, 2, 2, 0, 0, tzinfo=timezone.get_current_timezone()),
+                    datetime.datetime(2008, 2, 3, 0, 0, tzinfo=timezone.get_current_timezone())
                 ),
             ]
 
         else:
             expecteds = [
-                (0, datetime.datetime(2008, 1, 28, 0, 0, tzinfo=pytz.utc),
-                 datetime.datetime(2008, 1, 29, 0, 0, tzinfo=pytz.utc)),
-                (0, datetime.datetime(2008, 1, 29, 0, 0, tzinfo=pytz.utc),
-                 datetime.datetime(2008, 1, 30, 0, 0, tzinfo=pytz.utc)),
-                (0, datetime.datetime(2008, 1, 30, 0, 0, tzinfo=pytz.utc),
-                 datetime.datetime(2008, 1, 31, 0, 0, tzinfo=pytz.utc)),
-                (0, datetime.datetime(2008, 1, 31, 0, 0, tzinfo=pytz.utc),
-                 datetime.datetime(2008, 2, 1, 0, 0, tzinfo=pytz.utc)),
-                (0, datetime.datetime(2008, 2, 1, 0, 0, tzinfo=pytz.utc),
-                 datetime.datetime(2008, 2, 2, 0, 0, tzinfo=pytz.utc)),
-                (1, datetime.datetime(2008, 2, 2, 0, 0, tzinfo=pytz.utc),
-                 datetime.datetime(2008, 2, 3, 0, 0, tzinfo=pytz.utc)),
-                (0, datetime.datetime(2008, 2, 3, 0, 0, tzinfo=pytz.utc),
-                 datetime.datetime(2008, 2, 4, 0, 0, tzinfo=pytz.utc))
+                (0, datetime.datetime(2008, 1, 28, 0, 0, tzinfo=timezone.get_current_timezone()),
+                 datetime.datetime(2008, 1, 29, 0, 0, tzinfo=timezone.get_current_timezone())),
+                (0, datetime.datetime(2008, 1, 29, 0, 0, tzinfo=timezone.get_current_timezone()),
+                 datetime.datetime(2008, 1, 30, 0, 0, tzinfo=timezone.get_current_timezone())),
+                (0, datetime.datetime(2008, 1, 30, 0, 0, tzinfo=timezone.get_current_timezone()),
+                 datetime.datetime(2008, 1, 31, 0, 0, tzinfo=timezone.get_current_timezone())),
+                (0, datetime.datetime(2008, 1, 31, 0, 0, tzinfo=timezone.get_current_timezone()),
+                 datetime.datetime(2008, 2, 1, 0, 0, tzinfo=timezone.get_current_timezone())),
+                (0, datetime.datetime(2008, 2, 1, 0, 0, tzinfo=timezone.get_current_timezone()),
+                 datetime.datetime(2008, 2, 2, 0, 0, tzinfo=timezone.get_current_timezone())),
+                (1, datetime.datetime(2008, 2, 2, 0, 0, tzinfo=timezone.get_current_timezone()),
+                 datetime.datetime(2008, 2, 3, 0, 0, tzinfo=timezone.get_current_timezone())),
+                (0, datetime.datetime(2008, 2, 3, 0, 0, tzinfo=timezone.get_current_timezone()),
+                 datetime.datetime(2008, 2, 4, 0, 0, tzinfo=timezone.get_current_timezone()))
             ]
 
         for actual, expected in zip(actuals, expecteds):
@@ -194,11 +195,11 @@ class TestMonth(TestCase):
 
 
     def test_month_convenience_functions(self):
-        self.assertEqual( self.month.prev_month().start, datetime.datetime(2008, 1, 1, 0, 0, tzinfo=pytz.utc))
-        self.assertEqual( self.month.next_month().start, datetime.datetime(2008, 3, 1, 0, 0, tzinfo=pytz.utc))
-        self.assertEqual( self.month.current_year().start, datetime.datetime(2008, 1, 1, 0, 0, tzinfo=pytz.utc))
-        self.assertEqual( self.month.prev_year().start, datetime.datetime(2007, 1, 1, 0, 0, tzinfo=pytz.utc))
-        self.assertEqual( self.month.next_year().start, datetime.datetime(2009, 1, 1, 0, 0, tzinfo=pytz.utc))
+        self.assertEqual( self.month.prev_month().start, datetime.datetime(2008, 1, 1, 0, 0, tzinfo=timezone.get_current_timezone()))
+        self.assertEqual( self.month.next_month().start, datetime.datetime(2008, 3, 1, 0, 0, tzinfo=timezone.get_current_timezone()))
+        self.assertEqual( self.month.current_year().start, datetime.datetime(2008, 1, 1, 0, 0, tzinfo=timezone.get_current_timezone()))
+        self.assertEqual( self.month.prev_year().start, datetime.datetime(2007, 1, 1, 0, 0, tzinfo=timezone.get_current_timezone()))
+        self.assertEqual( self.month.next_year().start, datetime.datetime(2009, 1, 1, 0, 0, tzinfo=timezone.get_current_timezone()))
 
 
 class TestDay(TestCase):
@@ -207,12 +208,12 @@ class TestDay(TestCase):
                            date=datetime.datetime(2008, 2, 7, 9, 0, tzinfo=pytz.utc))
 
     def test_day_setup(self):
-        self.assertEqual( self.day.start, datetime.datetime(2008, 2, 7, 0, 0, tzinfo=pytz.utc))
-        self.assertEqual( self.day.end, datetime.datetime(2008, 2, 8, 0, 0, tzinfo=pytz.utc))
+        self.assertEqual( self.day.start, datetime.datetime(2008, 2, 7, 0, 0, tzinfo=timezone.get_current_timezone()))
+        self.assertEqual( self.day.end, datetime.datetime(2008, 2, 8, 0, 0, tzinfo=timezone.get_current_timezone()))
 
     def test_day_convenience_functions(self):
-        self.assertEqual( self.day.prev_day().start, datetime.datetime(2008, 2, 6, 0, 0, tzinfo=pytz.utc))
-        self.assertEqual( self.day.next_day().start, datetime.datetime(2008, 2, 8, 0, 0, tzinfo=pytz.utc))
+        self.assertEqual( self.day.prev_day().start, datetime.datetime(2008, 2, 6, 0, 0, tzinfo=timezone.get_current_timezone()))
+        self.assertEqual( self.day.next_day().start, datetime.datetime(2008, 2, 8, 0, 0, tzinfo=timezone.get_current_timezone()))
 
     def test_time_slot(self):
         slot_start = datetime.datetime(2008, 2, 7, 13, 30, tzinfo=pytz.utc)

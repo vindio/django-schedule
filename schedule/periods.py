@@ -32,7 +32,7 @@ class Period(object):
     based on its events, and its time period (start and end).
     """
     def __init__(self, events, start, end, parent_persisted_occurrences=None,
-                 occurrence_pool=None, tzinfo=pytz.utc):
+                 occurrence_pool=None, tzinfo=timezone.get_current_timezone()):
 
         self.utc_start = self._normalize_timezone_to_utc(start, tzinfo)
 
@@ -205,7 +205,7 @@ class Month(Period):
     and day periods within the date.
     """
     def __init__(self, events, date=None, parent_persisted_occurrences=None,
-                 occurrence_pool=None, tzinfo=pytz.utc):
+                 occurrence_pool=None, tzinfo=timezone.get_current_timezone()):
         self.tzinfo = self._get_tzinfo(tzinfo)
         if date is None:
             date = timezone.now()
@@ -280,7 +280,7 @@ class Week(Period):
     The Week period that has functions for retrieving Day periods within it
     """
     def __init__(self, events, date=None, parent_persisted_occurrences=None,
-                 occurrence_pool=None, tzinfo=pytz.utc):
+                 occurrence_pool=None, tzinfo=timezone.get_current_timezone()):
         self.tzinfo = self._get_tzinfo(tzinfo)
         if date is None:
             date = timezone.now()
@@ -344,7 +344,7 @@ class Week(Period):
 
 class Day(Period):
     def __init__(self, events, date=None, parent_persisted_occurrences=None,
-                 occurrence_pool=None, tzinfo=pytz.utc):
+                 occurrence_pool=None, tzinfo=timezone.get_current_timezone()):
         self.tzinfo = self._get_tzinfo(tzinfo)
         if date is None:
             date = timezone.now()

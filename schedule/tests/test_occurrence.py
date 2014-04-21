@@ -29,6 +29,14 @@ class TestOccurrence(TestCase):
             'end_recurring_period': datetime.datetime(2008, 5, 5, 0, 0, tzinfo=pytz.utc),
             'calendar': cal
         }
+        self.near_periodend_recurring_data = {
+            'title': 'Special Event',
+            'start': datetime.datetime(2014, 5, 1, 8, 0, tzinfo=pytz.utc),
+            'end': datetime.datetime(2014, 5, 1, 9, 0, tzinfo=pytz.utc),
+            'end_recurring_period': datetime.datetime(2014, 5, 8, 9, 0, tzinfo=pytz.utc),
+            'rule': rule,
+            'calendar': cal
+        }
         self.recurring_event = Event.objects.create(**self.recurring_data)
         self.start = datetime.datetime(2008, 1, 12, 0, 0, tzinfo=pytz.utc)
         self.end = datetime.datetime(2008, 1, 27, 0, 0, tzinfo=pytz.utc)
@@ -87,5 +95,14 @@ class TestOccurrence(TestCase):
         """
         o = Occurrence()
 
+    def test_occurrences_when_endperiod_is_near_and_other_timezone(self):
+        event2 = Event.objects.create(**self.near_periodend_recurring_data)
+        start = event2.end_recurring_period-datetime.timedelta(hours=5)
+        end = event2.end_recurring_period+datetime.timedelta(hours=12)
+        tz = pytz.timezone('Europe/Helsinki')
+        occurrences = event2.get_occurrences(
+                start=tz.normalize(start),
+                end=tz.normalize(end))
 
-
+        self.assertEqual(len(occurrences), 1)
+        self.assertEqual(occurrences[0].start, event2.start+datetime.timedelta(days=7))
