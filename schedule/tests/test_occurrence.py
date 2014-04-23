@@ -74,7 +74,9 @@ class TestOccurrence(TestCase):
 
     def test_occurrence_eq_method(self):
         event2 = Event.objects.create(**self.recurring_data)
-        self.assertEqual(self.recurring_event.get_occurrences(start=self.start, end=self.end)[0],
+        self.assertEqual(event2.get_occurrences(start=self.start, end=self.end)[0],
+                         event2.get_occurrences(start=self.start, end=self.end)[0])
+        self.assertNotEqual(self.recurring_event.get_occurrences(start=self.start, end=self.end)[0],
                          event2.get_occurrences(start=self.start, end=self.end)[0])
         self.assertNotEqual(self.recurring_event.get_occurrences(start=self.start, end=self.end)[0],
                             event2.get_occurrences(start=self.start, end=self.end)[1])

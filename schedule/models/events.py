@@ -433,5 +433,5 @@ class Occurrence(models.Model):
         return rank
 
     def __eq__(self, other):
-        return (isinstance(other, Occurrence) and
+        return (isinstance(other, Occurrence) and self.event == other.event and
                 self.original_start == other.original_start and self.original_end == other.original_end)
