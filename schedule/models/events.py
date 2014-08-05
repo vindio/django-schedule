@@ -461,9 +461,11 @@ class Occurrence(models.Model):
     def __cmp__(self, other):
         rank = cmp(self.start, other.start)
         if rank == 0:
-            return cmp(self.end, other.end)
+            rank = cmp(self.end, other.end)
+            if rank == 0:
+                return cmp(self.event, other.event)
         return rank
 
     def __eq__(self, other):
         return (isinstance(other, Occurrence) and
-                self.original_start == other.original_start and self.original_end == other.original_end)
+                self.original_start == other.original_start and self.original_end == other.original_end and self.event == other.event)
